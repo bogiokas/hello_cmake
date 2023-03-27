@@ -4,16 +4,35 @@
 #include "hellocmake/helloworld.hpp"
 
 
+class TestHelloWorld : public ::testing::Test {
+protected:
+    void RedirectCoutToTemp() {
+        tempBuffer = tempStream.rdbuf();
+        backupBuffer = std::cout.rdbuf();
+        std::cout.rdbuf(tempBuffer);
+    }
+    void RedirectBackupToCout() {
+        std::cout.rdbuf(backupBuffer);
+    }
+    std::stringstream tempStream;
+    std::streambuf *tempBuffer, *backupBuffer;
+};
 
-TEST(TestHelloWorld, EmptyInput) {
-    std::stringstream newStream;
-    std::streambuf *newBuffer = newStream.rdbuf();
-    std::streambuf *backupBuffer = std::cout.rdbuf();
-    std::cout.rdbuf(newBuffer);
+TEST_F(TestHelloWorld, EmptyInput) {
+    RedirectCoutToTemp();
 
     helloworld("");
+    EXPECT_EQ(tempStream.str(),"Hello !\n");
 
-    EXPECT_EQ(newStream.str(),"Hello !\n");
-
-    std::cout.rdbuf(backupBuffer);
+    RedirectBackupToCout();
 }
+
+TEST_F(TestHelloWorld, SimpleInput) {
+    RedirectCoutToTemp();
+
+    helloworld("you");
+    EXPECT_EQ(tempStream.str(),"Hello you!\n");
+
+    RedirectBackupToCout();
+}
+
