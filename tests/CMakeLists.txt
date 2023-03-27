@@ -20,5 +20,10 @@ enable_testing()
 add_executable(test1 test1.cpp)
 target_link_libraries(test1 GTest::gtest_main)
 
+add_executable(test2 test2.cpp)
+target_link_libraries(test2 GTest::gtest_main)
+target_link_libraries(test2 helloworld)
+
 include(GoogleTest)
 gtest_discover_tests(test1)
+gtest_discover_tests(test2)
